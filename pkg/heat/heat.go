@@ -1,6 +1,6 @@
 package heat
 
-const Size = 200
+const Size = 100.0
 
 type Grid [Size][Size]float64
 
@@ -21,36 +21,66 @@ func NewSimulation() *Simulation {
 }
 
 func initialConditions(grid *Grid) {
+	// Everything starts with half-temperature
+	for i := 0; i < Size; i++ {
+		for j := 0; j < Size; j++ {
+			grid[i][j] = 0.0
+		}
+	}
+
 	fixedConditions(grid)
 }
 
+func copyBoundariesFromNeighbors(grid *Grid) {
+	grid[0] = grid[1]
+	grid[Size-1] = grid[Size-2]
+	for i := 0; i < Size; i++ {
+		grid[i][0] = grid[i][1]
+		grid[i][Size-1] = grid[i][Size-2]
+	}
+}
+
 func fixedConditions(grid *Grid) {
-	for i := int(Size/2.0 - 20.0); i < int(Size/2.0+20.0); i++ {
+
+	// Walls should be fixed
+	temp := 0.0
+	for i := 0; i < Size; i++ {
+		grid[0][i] = temp
+		grid[Size-1][i] = temp
+		grid[i][0] = temp
+		grid[i][Size-1] = temp
+	}
+
+	unit := int(Size * 0.05)
+
+	for i := int(Size/2.0 - 4*unit); i < int(Size/2.0+4*unit); i++ {
 		grid[0][i] = 255.0
 		grid[Size-1][i] = 255.0
 		grid[i][0] = 255.0
 		grid[i][Size-1] = 255.0
 	}
-	for i := -10; i <= 10; i++ {
-		for j := -10; j <= 10; j++ {
-			if i*i+j*j < 10*10 {
+	unit = 2 * unit
+	for i := -unit; i <= unit; i++ {
+		for j := -unit; j <= unit; j++ {
+			if i*i+j*j < unit*unit {
 				center := int(Size / 2.0)
+				_ = center
 				grid[center+i][center+j] = 255.0
 			}
 		}
 	}
-	/*
-		for i := -10; i <= 10; i++ {
-			for j := -10; j <= 10; j++ {
-				if i*i+j*j < 10*10 {
-					center := int(Size / 4.0)
-					grid[center+i][center+j] = 255.0
-					center = int(Size / 4.0 * 3.0)
-					grid[center+i][center+j] = 255.0
-				}
+	//unit = unit / 4.0
+	for i := -unit; i <= unit; i++ {
+		for j := -unit; j <= unit; j++ {
+			if i*i+j*j < unit*unit {
+				center := int(Size / 4.0)
+				//grid[center+i][center+j] = 255.0
+				center = int(Size / 4.0 * 3.0)
+				//grid[center+i][center+j] = 255.0
+				_ = center
 			}
 		}
-	*/
+	}
 }
 
 func (s *Simulation) Progress(ticks int) {
@@ -80,6 +110,8 @@ func (s *Simulation) OneNextTick() {
 		}
 	}
 
+	// Copy boundaries from neighbors before applying fixedConditions
+	copyBoundariesFromNeighbors(&nextGrid)
 	fixedConditions(&nextGrid)
 	s.grid = &nextGrid
 }

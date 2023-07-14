@@ -21,13 +21,13 @@ func (g *Game) Update() error {
 	return nil
 }
 
-const Size = 600.0
+const Size = g.Simulation.GetSize * 4.0
 
 var cm = colormap.Magma
 
 func (g *Game) Draw(screen *ebiten.Image) {
 
-	g.Simulation.Progress(100)
+	g.Simulation.Progress(10)
 	grid := g.Simulation.GetGrid()
 	ratio := Size / g.Simulation.GetSize()
 
