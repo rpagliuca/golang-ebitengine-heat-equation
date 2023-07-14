@@ -21,7 +21,7 @@ func (g *Game) Update() error {
 	return nil
 }
 
-const Size = g.Simulation.GetSize * 4.0
+const Size = 400.0
 
 var cm = colormap.Magma
 
