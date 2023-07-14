@@ -21,7 +21,7 @@ func NewSimulation() *Simulation {
 }
 
 func initialConditions(grid *Grid) {
-	// Everything starts with half-temperature
+	// Everything starts with zero temperature
 	for i := 0; i < Size; i++ {
 		for j := 0; j < Size; j++ {
 			grid[i][j] = 0.0
@@ -54,29 +54,27 @@ func fixedConditions(grid *Grid) {
 	unit := int(Size * 0.05)
 
 	for i := int(Size/2.0 - 4*unit); i < int(Size/2.0+4*unit); i++ {
-		grid[0][i] = 255.0
-		grid[Size-1][i] = 255.0
-		grid[i][0] = 255.0
-		grid[i][Size-1] = 255.0
+		//grid[0][i] = 255.0
+		//grid[Size-1][i] = 255.0
+		//grid[i][0] = 255.0
+		//grid[i][Size-1] = 255.0
 	}
-	unit = 2 * unit
 	for i := -unit; i <= unit; i++ {
 		for j := -unit; j <= unit; j++ {
 			if i*i+j*j < unit*unit {
 				center := int(Size / 2.0)
 				_ = center
-				grid[center+i][center+j] = 255.0
+				//grid[center+i][center+j] = 255.0
 			}
 		}
 	}
-	//unit = unit / 4.0
 	for i := -unit; i <= unit; i++ {
 		for j := -unit; j <= unit; j++ {
 			if i*i+j*j < unit*unit {
 				center := int(Size / 4.0)
-				//grid[center+i][center+j] = 255.0
+				grid[center+i][center+j] = 255.0
 				center = int(Size / 4.0 * 3.0)
-				//grid[center+i][center+j] = 255.0
+				grid[center+i][center+j] = 255.0
 				_ = center
 			}
 		}
