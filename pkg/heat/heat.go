@@ -21,13 +21,6 @@ func NewSimulation() *Simulation {
 }
 
 func initialConditions(grid *Grid) {
-	// Everything starts with zero temperature
-	for i := 0; i < Size; i++ {
-		for j := 0; j < Size; j++ {
-			grid[i][j] = 0.0
-		}
-	}
-
 	fixedConditions(grid)
 }
 
@@ -42,7 +35,7 @@ func copyBoundariesFromNeighbors(grid *Grid) {
 
 func fixedConditions(grid *Grid) {
 
-	// Walls should be fixed
+	// Walls should have fixed 0 temperature
 	temp := 0.0
 	for i := 0; i < Size; i++ {
 		grid[0][i] = temp
@@ -52,33 +45,18 @@ func fixedConditions(grid *Grid) {
 	}
 
 	unit := int(Size * 0.05)
+	_ = unit
 
-	for i := int(Size/2.0 - 4*unit); i < int(Size/2.0+4*unit); i++ {
-		//grid[0][i] = 255.0
-		//grid[Size-1][i] = 255.0
-		//grid[i][0] = 255.0
-		//grid[i][Size-1] = 255.0
-	}
-	for i := -unit; i <= unit; i++ {
-		for j := -unit; j <= unit; j++ {
-			if i*i+j*j < unit*unit {
-				center := int(Size / 2.0)
-				_ = center
-				//grid[center+i][center+j] = 255.0
-			}
+	/*
+		for i := int(Size/2.0 - 4*unit); i < int(Size/2.0+4*unit); i++ {
+			grid[0][i] = 1.0
+			grid[Size-1][i] = 1.0
+			grid[i][0] = 1.0
+			grid[i][Size-1] = 1.0
 		}
-	}
-	for i := -unit; i <= unit; i++ {
-		for j := -unit; j <= unit; j++ {
-			if i*i+j*j < unit*unit {
-				center := int(Size / 4.0)
-				grid[center+i][center+j] = 255.0
-				center = int(Size / 4.0 * 3.0)
-				grid[center+i][center+j] = 255.0
-				_ = center
-			}
-		}
-	}
+	*/
+
+	//addCircularSource(grid, int(Size/2.0), int(Size/2.0), 1, 1.0)
 }
 
 func (s *Simulation) Progress(ticks int) {
@@ -120,4 +98,27 @@ func (s *Simulation) GetGrid() *Grid {
 
 func (s *Simulation) GetSize() int {
 	return Size
+}
+
+func (s *Simulation) AddSource(x, y int) {
+	addCircularSource(s.grid, x, y, 5, 1.0)
+}
+
+func addCircularSource(grid *Grid, x, y, radius int, temperature float64) {
+	for i := -radius; i <= radius; i++ {
+		for j := -radius; j <= radius; j++ {
+			if i*i+j*j <= radius*radius {
+				if inBoundaries(grid, x+i, y+j) {
+					grid[x+i][y+j] = temperature
+				}
+			}
+		}
+	}
+}
+
+func inBoundaries(grid *Grid, x, y int) bool {
+	if x >= 0 && y >= 0 && x < len(grid) && y < len(grid) {
+		return true
+	}
+	return false
 }

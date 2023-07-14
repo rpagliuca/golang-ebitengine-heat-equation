@@ -2,8 +2,10 @@ package game
 
 import (
 	"app/pkg/heat"
+	"fmt"
 	_ "image/png"
 	"log"
+	"math"
 
 	"github.com/fogleman/colormap"
 
@@ -21,22 +23,47 @@ func (g *Game) Update() error {
 	return nil
 }
 
-const Size = 400.0
+const Size = 600.0
 
 var cm = colormap.Magma
 
 func (g *Game) Draw(screen *ebiten.Image) {
 
-	g.Simulation.Progress(5)
+	g.Simulation.Progress(3)
 	grid := g.Simulation.GetGrid()
-	ratio := Size / g.Simulation.GetSize()
+	ratio := float64(Size) / float64(g.Simulation.GetSize())
 
 	for i := 0; i < g.Simulation.GetSize(); i++ {
 		for j := 0; j < g.Simulation.GetSize(); j++ {
-			clr := cm.At(grid[i][j] / 256.0)
-			ebitenutil.DrawRect(screen, float64(ratio*i), float64(ratio*j), float64(ratio), float64(ratio), clr)
+			clr := cm.At(grid[i][j])
+			ebitenutil.DrawRect(screen, ratio*float64(i), ratio*float64(j), ratio, ratio, clr)
 		}
 	}
+
+	intMouseX, intMouseY := ebiten.CursorPosition()
+
+	x := int(math.Floor(float64(intMouseX) / ratio))
+	y := int(math.Floor(float64(intMouseY) / ratio))
+
+	if mouseInScreen() {
+		temp := 15.0 + (285.0)*grid[x][y]
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("Temperatura no cursor: %.1f", temp))
+	}
+
+	if mouseInScreen() && ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
+		g.Simulation.AddSource(x, y)
+	}
+
+	fps := ebiten.ActualTPS()
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("FPS: %.2f", fps), 0, Size-16)
+}
+
+func mouseInScreen() bool {
+	mX, mY := ebiten.CursorPosition()
+	if mX >= 0 && mY >= 0 && mX < Size && mY < Size {
+		return true
+	}
+	return false
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
