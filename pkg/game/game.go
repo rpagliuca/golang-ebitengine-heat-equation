@@ -27,7 +27,7 @@ var cm = colormap.Magma
 
 func (g *Game) Draw(screen *ebiten.Image) {
 
-	g.Simulation.Progress(10)
+	g.Simulation.Progress(5)
 	grid := g.Simulation.GetGrid()
 	ratio := Size / g.Simulation.GetSize()
 
